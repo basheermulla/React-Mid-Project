@@ -38,18 +38,18 @@ function App() {
 
   return (
     <>
-      <div className="p-5 bg-dark text-white text-center">
+      <div className="p-5 text-white text-center" style={{ backgroundColor: '#3083cb' }}>
         <h1>My React Application</h1>
         <p>This is the My Mid Project of React course!</p>
       </div>
-      <nav className="navbar navbar-light">
+      <nav className="navbar navbar-light" style={{ backgroundColor: '#aed6f0' }}>
         <div className="container-fluid col-sm-4">
           <form className="d-flex">
             <input className="form-control me-5" type="search" placeholder="Search" aria-label="Search" />
           </form>
         </div>
         <div className="container-fluid col-sm-8">
-          <Button variant="outline-primary" onClick={handleNavigate}> Add </Button><br /><br />
+          <Button variant="primary" onClick={handleNavigate}> Add </Button><br /><br />
         </div>
       </nav>
       <div className="container mt-5">
@@ -62,13 +62,13 @@ function App() {
               <h5> Email [String]</h5>
               <div className='row'>
                 <div className='col-sm-4'>
-                  <Button variant="info" onClick={handleNavigate}> Other Data </Button><br /><br />
+                  <Button variant="primary" onClick={handleNavigate}> Other Data </Button><br /><br />
                 </div>
                 <div className='col-sm-2'>
-                  <Button variant="info" onClick={handleNavigate}> Update </Button><br /><br />
+                  <Button variant="primary" onClick={handleNavigate}> Update </Button><br /><br />
                 </div>
                 <div className='col-sm-2'>
-                  <Button variant="info" onClick={handleNavigate}> Delete </Button><br /><br />
+                  <Button variant="primary" onClick={handleNavigate}> Delete </Button><br /><br />
                 </div>
               </div>
               <div>
@@ -91,8 +91,8 @@ function App() {
         </div>
       </div>
 
-      <div className="mt-5 p-4 bg-dark text-white text-center">
-        <p>Footer</p>
+      <div className="mt-5 p-4 text-white text-center" style={{ backgroundColor: '#3083cb' }}>
+        <h4>Footer</h4>
       </div>
     </>
   )

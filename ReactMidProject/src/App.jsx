@@ -17,12 +17,34 @@ const TODOS_URL = 'https://jsonplaceholder.typicode.com/todos';
 const POSTS_URL = 'https://jsonplaceholder.typicode.com/posts';
 
 function App() {
-  const [users, setUsers] = useState([]);
-  const [todos, setTodos] = useState([]);
-  const [posts, setPosts] = useState([]);
+  const [usersDB, setUsersDB] = useState([]);
+  const [todosDB, setTodosDB] = useState([]);
+  const [postsDB, setPostsDB] = useState([]);
+
+  const [usersOnShow, setUsersOnShow] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
 
+  // <-------------- To view the search term input -------------->
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  }
+
+  // <-------------- useEffect Search -------------->
+  useEffect(() => {
+    // Filter users to show
+    const results = usersDB.filter(user => {
+      const lowerCase_Search = searchTerm.toLowerCase();
+      const lowerCase_Name = user.name.toLowerCase();
+      const lowerCase_Email = user.email.toLowerCase();
+      return lowerCase_Name.includes(lowerCase_Search)|| lowerCase_Email.includes(lowerCase_Search)
+    });
+
+    setUsersOnShow(results);
+  }, [searchTerm]);
+
+  // <-------------- To navigate through the pages -------------->
   function handleNavigate(e) {
     const nav = e.target.innerText;
     switch (nav) {
@@ -44,11 +66,11 @@ function App() {
     }
   }
 
+  // <-------------- To check if the user's todos are completed -------------->
   const checkCompletedTodos = (userId) => {
-    const todosUser = todos.filter((todo) => todo.userId === userId);
+    const todosUser = todosDB.filter((todo) => todo.userId === userId);
     const notYet = todosUser.find((todo) => !todo.completed);
-    return !notYet
-
+    return !notYet;
   }
 
   // <-------------- useEffect USERS -------------->
@@ -62,7 +84,7 @@ function App() {
       console.log(data);
 
       // Update state
-      setUsers(data);
+      setUsersDB(data);
     }
 
     // Invoke the async function
@@ -77,7 +99,7 @@ function App() {
       console.log(data);
 
       // Update state
-      setTodos(data);
+      setTodosDB(data);
     }
 
     // Invoke the async function
@@ -92,7 +114,7 @@ function App() {
       console.log(data);
 
       // Update state
-      setPosts(data);
+      setPostsDB(data);
     }
 
     // Invoke the async function
@@ -105,14 +127,14 @@ function App() {
         <h1>My React Application</h1>
         <p>This is the My Mid Project of React course!</p>
       </div>
-      <nav className="navbar navbar-light" style={{ backgroundColor: '#aed6f0' }}>
+      <nav className="navbar navbar-light bg-danger" /*style={{ backgroundColor: '#aed6f0' }}*/>
         <div className="container-fluid col-sm-4">
           <form className="d-flex">
-            <input className="form-control me-5" type="search" placeholder="Search" aria-label="Search" />
+            <input className="form-control me-5" type="search" placeholder="Search" aria-label='Search' onChange={handleSearch} />
           </form>
         </div>
         <div className="container-fluid col-sm-8">
-          <Button variant="primary" onClick={handleNavigate}> Add </Button><br /><br />
+          <Button variant="light" onClick={handleNavigate}> Add </Button><br /><br />
         </div>
       </nav>
       <div className="container mt-5">
@@ -120,7 +142,7 @@ function App() {
           <div className="col-sm-7 border border-dark" style={{ borderRadius: '64px' }}>
             <h2>My Users</h2>
             {
-              users.map((user) => {
+              usersOnShow.map((user) => {
                 return <UserCardComp userData={user} key={user.id} callbackNavigate={handleNavigate} isUnCompleted={checkCompletedTodos(user.id)} />
               })
             }

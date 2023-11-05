@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap-v5';
 import './UserCard.css'
 
 function UserCardComp({ userData, callbackNavigate, isUnCompleted }) {
-    const [user, setUser] = useState({ id: '', name: '', email: '', street: '', city: '', zipcode: '' });
+    const [user, setUser] = useState({});
     const [showOtherData, setShowOtherData] = useState(false);
     const [isCompleted, setIsCompleted] = useState(isUnCompleted);
 
@@ -36,12 +36,18 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted }) {
                         <input className="form-control-static" type="text" value={user.email} readOnly />
                     </div>
                 </div>
-                <div className='row'>
-                    <div className='col-sm-4'>
-                        <Button variant="secondary" onMouseOver={(e) => setShowOtherData(true)}> Other Data </Button>
+                <div className='row flex-row-reverse'>
+                    <div className='col-sm-2' hidden={showOtherData}>
+                        <Button variant="danger" onClick={(e) => callbackNavigate(e)}> Delete </Button>
+                    </div>
+                    <div className='col-sm-2' hidden={showOtherData}>
+                        <Button variant="info" onClick={(e) => callbackNavigate(e)}> Update </Button>
+                    </div>
+                    <div className={showOtherData ? 'col-sm-12' : 'col-sm-8'}>
+                        <Button variant="dark" onMouseOver={(e) => setShowOtherData(true)}> Other Data </Button>
                     </div>
                 </div>
-                <br />
+                <br hidden={!showOtherData}/>
                 <div className='otherData_div' hidden={!showOtherData} onClick={() => setShowOtherData(false)}>
                     <div className='row'>
                         <div className='col-sm-2'>
@@ -70,12 +76,12 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted }) {
                         </div>
                     </div>
                 </div >
-                <br />
+                <br hidden={!showOtherData}/>
                 <div className='row flex-row-reverse'>
-                    <div className='col-sm-2'>
+                    <div className='col-sm-2' hidden={!showOtherData}>
                         <Button variant="danger" onClick={(e) => callbackNavigate(e)}> Delete </Button>
                     </div>
-                    <div className='col-sm-2'>
+                    <div className='col-sm-2' hidden={!showOtherData}>
                         <Button variant="info" onClick={(e) => callbackNavigate(e)}> Update </Button>
                     </div>
                 </div>

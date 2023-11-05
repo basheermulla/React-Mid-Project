@@ -1,9 +1,3 @@
-h3 {
-  text-decoration: underline;
-  font-weight: bold;
-  color: blueviolet;
-}
-
 Label {
   display: flex;
   font-weight: bold;

@@ -8,9 +8,13 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted }) {
     const [showOtherData, setShowOtherData] = useState(false);
     const [isCompleted, setIsCompleted] = useState(isUnCompleted);
 
+    const handle = (e) => {
+        callbackNavigate(e, user)
+    }
+
     useEffect(() => {
         setUser(userData);
-    }, [])
+    }, [userData])
 
     return (
         <>
@@ -25,7 +29,7 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted }) {
                         <label className='displayInLine_label'> Name: </label>
                     </div>
                     <div className='col-sm-6'>
-                        <input className="form-control-static" type="text" value={user.name} readOnly />
+                        <input className="form-control-static" type="text" value={user.name || ''} readOnly />
                     </div>
                 </div>
                 <div className='row'>
@@ -33,15 +37,15 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted }) {
                         <label className='displayInLine_label'> Email: </label>
                     </div>
                     <div className='col-sm-6'>
-                        <input className="form-control-static" type="text" value={user.email} readOnly />
+                        <input className="form-control-static" type="text" value={user.email || ''} readOnly />
                     </div>
                 </div>
                 <div className='row flex-row-reverse'>
                     <div className='col-sm-2' hidden={showOtherData}>
-                        <Button variant="danger" onClick={(e) => callbackNavigate(e)}> Delete </Button>
+                        <Button variant="danger" onClick={(e) => handle(e)}> Delete </Button>
                     </div>
                     <div className='col-sm-2' hidden={showOtherData}>
-                        <Button variant="info" onClick={(e) => callbackNavigate(e)}> Update </Button>
+                        <Button variant="info" onClick={(e) => handle(e)}> Update </Button>
                     </div>
                     <div className={showOtherData ? 'col-sm-12' : 'col-sm-8'}>
                         <Button variant="dark" onMouseOver={(e) => setShowOtherData(true)}> Other Data </Button>
@@ -79,10 +83,10 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted }) {
                 <br hidden={!showOtherData}/>
                 <div className='row flex-row-reverse'>
                     <div className='col-sm-2' hidden={!showOtherData}>
-                        <Button variant="danger" onClick={(e) => callbackNavigate(e)}> Delete </Button>
+                        <Button variant="danger" onClick={(e) => handle(e)}> Delete </Button>
                     </div>
                     <div className='col-sm-2' hidden={!showOtherData}>
-                        <Button variant="info" onClick={(e) => callbackNavigate(e)}> Update </Button>
+                        <Button variant="info" onClick={(e) => handle(e)}> Update </Button>
                     </div>
                 </div>
             </div >

@@ -26,36 +26,26 @@ function App() {
 
   const navigate = useNavigate();
 
-  // <-------------- To view the search term input -------------->
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  }
-
-  // <-------------- useEffect Search -------------->
-  useEffect(() => {
-    // Filter users to show
-    const results = usersDB.filter(user => {
-      const lowerCase_Search = searchTerm.toLowerCase();
-      const lowerCase_Name = user.name.toLowerCase();
-      const lowerCase_Email = user.email.toLowerCase();
-      return lowerCase_Name.includes(lowerCase_Search)|| lowerCase_Email.includes(lowerCase_Search)
-    });
-
-    setUsersOnShow(results);
-  }, [searchTerm]);
-
   // <-------------- To navigate through the pages -------------->
-  function handleNavigate(e) {
+  function handleNavigate(e, obj) {
+    console.log(e);
+    console.log(obj);
     const nav = e.target.innerText;
     switch (nav) {
       case 'Add':
         navigate("/addNewUser");
         break;
       case 'Update':
-        navigate("/updateUser");
+        let updatePath = `updateUser`;
+        const updateUser = obj;
+        const updateData = { state: { updateUser } };
+        navigate(`/${updatePath}`, updateData);
         break;
       case 'Delete':
-        navigate("/deleteUser");
+        let deletePath = `deleteUser`;
+        const deleteUser = obj;
+        const deleteData = { state: { deleteUser } };
+        navigate(`/${deletePath}`, deleteData);
         break;
       case 'Other Data':
         navigate("/otherData");
@@ -73,7 +63,36 @@ function App() {
     return !notYet;
   }
 
-  // <-------------- useEffect USERS -------------->
+  // <-------------- To view the search term input -------------->
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  }
+
+  // <-------------- Update Data Base after UPDATE a particular User -------------->
+  const updateUsersDB = (newUser) => {
+    const newStateUsersDB = usersDB.map((user) => {
+      if (user.id === newUser.id) {
+        return newUser;
+      } else {
+        return user;
+      }
+    });
+
+    // Update state
+    setUsersDB(newStateUsersDB);
+    setUsersOnShow(newStateUsersDB);
+  }
+
+  // <-------------- Update Data Base after DELETE a particular User -------------->
+  const deleteUserFromUsersDB = (userId) => {
+    const newStateUsersDB = usersDB.filter((user) => user.id !== userId);
+
+    // Update state
+    setUsersDB(newStateUsersDB);
+    setUsersOnShow(newStateUsersDB);
+  }
+
+  // <-------------- useEffect Get All USERS -------------->
   useEffect(() => {
     // // storing input name
     // localStorage.setItem("name", JSON.stringify(name));
@@ -85,18 +104,19 @@ function App() {
 
       // Update state
       setUsersDB(data);
+      setUsersOnShow(data);
     }
 
     // Invoke the async function
     getAllUsers();
   }, []);
 
-  // <-------------- useEffect TODOS -------------->
+  // <-------------- useEffect Get All TODOS -------------->
   useEffect(() => {
     // Get All Todos =>>  <<--- Rest API called utils.js --->>
     const getAllTodos = async () => {
       const { data } = await getAll(`${TODOS_URL}`);
-      console.log(data);
+      // console.log(data);
 
       // Update state
       setTodosDB(data);
@@ -106,12 +126,12 @@ function App() {
     getAllTodos();
   }, []);
 
-  // <-------------- useEffect POSTS -------------->
+  // <-------------- useEffect Get All POSTS -------------->
   useEffect(() => {
     // Get All Posts =>>  <<--- Rest API called utils.js --->>
     const getAllPosts = async () => {
       const { data } = await getAll(`${POSTS_URL}`);
-      console.log(data);
+      // console.log(data);
 
       // Update state
       setPostsDB(data);
@@ -120,6 +140,19 @@ function App() {
     // Invoke the async function
     getAllPosts();
   }, []);
+
+  // <-------------- useEffect Search -------------->
+  useEffect(() => {
+    // Filter users to show
+    const results = usersDB.filter(user => {
+      const lowerCase_Search = searchTerm.toLowerCase();
+      const lowerCase_Name = user.name.toLowerCase();
+      const lowerCase_Email = user.email.toLowerCase();
+      return lowerCase_Name.includes(lowerCase_Search) || lowerCase_Email.includes(lowerCase_Search)
+    });
+
+    setUsersOnShow(results);
+  }, [searchTerm]);
 
   return (
     <>
@@ -130,7 +163,7 @@ function App() {
       <nav className="navbar navbar-light bg-danger" /*style={{ backgroundColor: '#aed6f0' }}*/>
         <div className="container-fluid col-sm-4">
           <form className="d-flex">
-            <input className="form-control me-5" type="search" placeholder="Search" aria-label='Search' onChange={handleSearch} />
+            <input className="form-control me-5" type="search" placeholder="Search" onChange={handleSearch} />
           </form>
         </div>
         <div className="container-fluid col-sm-8">
@@ -140,7 +173,7 @@ function App() {
       <div className="container mt-5">
         <div className="row">
           <div className="col-sm-7 border border-dark" style={{ borderRadius: '64px' }}>
-            <h2>My Users</h2>
+            <h3>My Users</h3>
             {
               usersOnShow.map((user) => {
                 return <UserCardComp userData={user} key={user.id} callbackNavigate={handleNavigate} isUnCompleted={checkCompletedTodos(user.id)} />
@@ -150,8 +183,8 @@ function App() {
           <Routes>
             <Route path='/' element={<HomePageComp />} />
             <Route path='/addNewUser' element={<AddNewUserComp />} />
-            <Route path='/updateUser' element={<UpdateUserComp />} />
-            <Route path='/deleteUser' element={<DeleteUserComp />} />
+            <Route path='/updateUser' element={<UpdateUserComp callbackUpdateUser={updateUsersDB} />} />
+            <Route path='/deleteUser' element={<DeleteUserComp callbackDeleteUser={deleteUserFromUsersDB} />} />
             <Route path='/otherData' element={<OtherDataComp />} >
               <Route path='/otherData/addTodo' element={<AddTodoComp />} />
               <Route path='/otherData/addPost' element={<AddPostComp />} />

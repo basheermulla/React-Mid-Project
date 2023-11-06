@@ -5,7 +5,7 @@ import { Form, Button } from 'react-bootstrap-v5';
 
 function UpdateUserComp({ callbackUpdateUser }) {
     const [user, setUser] = useState(useLocation().state.updateUser);
-    
+
     let navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -27,11 +27,15 @@ function UpdateUserComp({ callbackUpdateUser }) {
 
     return (
         <>
-            <div className="col-sm-5 border border-">
-                <h3> Update User </h3>
+            <div className="col-sm-5">
+                <div className='card mb-3 border border-dark rounded-bottom' style={{ borderRadius: '32px', backgroundColor: '#e8eaec' }}>
+                    <div className='d-flex justify-content-center'>
+                        <h3> Update User </h3>
+                    </div>
+                </div>
                 <div className='row'>
                     <Form onSubmit={handleSubmit}>
-                        <div className='card'>
+                        <div className='card border border-dark'>
                             <Form.Group className="mb-3" onChange={(e) => setUser({ ...user, name: e.target.value })} controlId="exampleForm.ControlInput1">
                                 <Form.Label> Name </Form.Label>
                                 <Form.Control required type="text" placeholder="Name" defaultValue={user['name']} />
@@ -60,7 +64,7 @@ function UpdateUserComp({ callbackUpdateUser }) {
                         <Button variant="outline-primary" type="submit"> Update </Button>
                     </Form>
                 </div>
-            </div>
+            </div >
         </>
     )
 }

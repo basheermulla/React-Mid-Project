@@ -5,21 +5,20 @@ import { Button } from 'react-bootstrap-v5';
 import { getAll } from './Rest_API/utils';
 import HomePageComp from './pages/HomePage/HomePage';
 import AddNewUserComp from './pages/AddNewUser/AddNewUser';
-import OtherDataComp from './pages/OtherData/OtherData';
 import UpdateUserComp from './pages/UpdateUser/UpdateUser';
-import DeleteUserComp from './pages/DeleteUser/DeleteUser';
-import AddTodoComp from './pages/AddTodo/AddTodo';
-import AddPostComp from './pages/AddPost/AddPost';
 import UserCardComp from './components/UserCard/UserCard';
+import SelectingUserComp from './pages/SelectingUser/SelectingUser';
+import DisplayTodosComp from './pages/DisplayTodos/DisplayTodos';
+import DisplayPostsComp from './pages/DisplayPosts/DisplayPosts';
+import { POSTS_URL, TODOS_URL, USERS_URL } from './config/constants';
+import 'sweetalert2/src/sweetalert2.scss'
 
-const USERS_URL = 'https://jsonplaceholder.typicode.com/users';
-const TODOS_URL = 'https://jsonplaceholder.typicode.com/todos';
-const POSTS_URL = 'https://jsonplaceholder.typicode.com/posts';
 
 function App() {
   const [usersDB, setUsersDB] = useState([]);
   const [todosDB, setTodosDB] = useState([]);
   const [postsDB, setPostsDB] = useState([]);
+  const [userIdColoredOrange, setUserIdColoredOrange] = useState('');
 
   const [usersOnShow, setUsersOnShow] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,9 +27,10 @@ function App() {
 
   // <-------------- To navigate through the pages -------------->
   function handleNavigate(e, obj) {
-    console.log(e);
-    console.log(obj);
     const nav = e.target.innerText;
+    if (nav !== `ID: ${obj.id}`) {
+      setUserIdColoredOrange('');
+    }
     switch (nav) {
       case 'Add':
         navigate("/addNewUser");
@@ -42,13 +42,18 @@ function App() {
         navigate(`/${updatePath}`, updateData);
         break;
       case 'Delete':
-        let deletePath = `deleteUser`;
-        const deleteUser = obj;
-        const deleteData = { state: { deleteUser } };
-        navigate(`/${deletePath}`, deleteData);
+        deleteUserFromUsersDB(obj.id);
         break;
-      case 'Other Data':
-        navigate("/otherData");
+      case `ID: ${obj.id}`: // Selecting User - Posts & Todos Are Presented
+        let selectingUserPath = `selectingUser`;
+        const selectedUser = obj;
+        const postsUser = postsDB.filter((post) => post.userId === selectedUser.id);
+        const todosUser = todosDB.filter((todo) => todo.userId === selectedUser.id);
+
+        controlRegionColoredOrange(selectedUser.id);
+
+        const selectedData = { state: { selectedUser, postsUser, todosUser } };
+        navigate(`/${selectingUserPath}`, selectedData);
         break;
       default:
         navigate("/");
@@ -61,6 +66,11 @@ function App() {
     const todosUser = todosDB.filter((todo) => todo.userId === userId);
     const notYet = todosUser.find((todo) => !todo.completed);
     return !notYet;
+  }
+
+  // <-------------- To control the Region Colored Orange  -------------->
+  const controlRegionColoredOrange = (userId) => {
+    setUserIdColoredOrange(userId);
   }
 
   // <-------------- To view the search term input -------------->
@@ -170,24 +180,36 @@ function App() {
           <Button variant="light" onClick={handleNavigate}> Add </Button><br /><br />
         </div>
       </nav>
+
       <div className="container mt-5">
         <div className="row">
-          <div className="col-sm-7 border border-dark" style={{ borderRadius: '64px' }}>
-            <h3>My Users</h3>
-            {
-              usersOnShow.map((user) => {
-                return <UserCardComp userData={user} key={user.id} callbackNavigate={handleNavigate} isUnCompleted={checkCompletedTodos(user.id)} />
-              })
-            }
+          <div className="col-sm-7">
+            <div className='card mb-3 border border-dark rounded-bottom' style={{ borderRadius: '32px', backgroundColor: '#e8eaec' }}>
+              <div className='d-flex justify-content-center'>
+                <h3> My Users </h3>
+              </div>
+            </div>
+            <div className='card mb-3 border border-dark'>
+              {
+                usersOnShow && usersOnShow.length > 0 ? usersOnShow.map((user) => {
+                  return <UserCardComp
+                    userData={user}
+                    key={user.id}
+                    callbackNavigate={handleNavigate}
+                    isUnCompleted={checkCompletedTodos(user.id)}
+                    userIdColoredOrange={userIdColoredOrange}
+                  />
+                }) : 'No Users Found'
+              }
+            </div>
           </div>
           <Routes>
             <Route path='/' element={<HomePageComp />} />
             <Route path='/addNewUser' element={<AddNewUserComp />} />
             <Route path='/updateUser' element={<UpdateUserComp callbackUpdateUser={updateUsersDB} />} />
-            <Route path='/deleteUser' element={<DeleteUserComp callbackDeleteUser={deleteUserFromUsersDB} />} />
-            <Route path='/otherData' element={<OtherDataComp />} >
-              <Route path='/otherData/addTodo' element={<AddTodoComp />} />
-              <Route path='/otherData/addPost' element={<AddPostComp />} />
+            <Route path='/selectingUser' element={<SelectingUserComp />} >
+              <Route path='/selectingUser/displayTodos' element={<DisplayTodosComp />} />
+              <Route path='/selectingUser/displayPosts' element={<DisplayPostsComp />} />
             </Route>
           </Routes>
         </div>

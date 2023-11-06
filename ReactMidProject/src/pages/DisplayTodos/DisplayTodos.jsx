@@ -1,23 +1,48 @@
 import { useEffect, useState } from 'react';
 import './DisplayTodos.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from 'react-bootstrap-v5';
+import { Button, Form, Row, Col } from 'react-bootstrap-v5';
 
-function DisplayTodosComp({ callbackSetShowTodos, showTodos }) {
+function DisplayTodosComp({ callbackSetCompleted, callbackSetShowTodos, showTodos, callbackInsertNewTodo }) {
     const [user, setUser] = useState({});
     const [todos, setTodos] = useState([]);
-    // const [showTodos, setShowTodos] = useState(true);
+    const [newTitle, setNewTitle] = useState('');
 
     const location = useLocation().state;
 
     const navigate = useNavigate();
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        console.log(form.checkValidity());
+        if (form.checkValidity() === false) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        const todo = {
+            userId: user.id,
+            title: newTitle,
+            completed: false
+        }
+
+        console.log(todo);
+        setNewTitle('')
+        e.target.reset();
+
+        callbackInsertNewTodo(todo);
+        callbackSetShowTodos();
+    }
+
     useEffect(() => {
         setUser(location.selectedUser);
         setTodos(location.todosUser);
-        console.log(location.selectedUser);
-        console.log(location.todosUser);
-    }, [location.selectedUser.id])
+    }, [location.selectedUser.id]);
+
+    useEffect(() => {
+        setTodos(location.todosUser);
+    }, [location.todosUser])
 
     return (
         <>
@@ -37,7 +62,7 @@ function DisplayTodosComp({ callbackSetShowTodos, showTodos }) {
                                     <label className='col-form-label'> {todo.completed.toString()} </label>
                                 </div>
                                 <div className="col-sm-6">
-                                    <Button variant="warning" hidden={todo.completed}> Mark Completed</Button>
+                                    <Button variant="warning" hidden={todo.completed} onClick={() => callbackSetCompleted(todo.id)}> Mark Completed</Button>
                                 </div>
                             </div>
                         </div>
@@ -46,33 +71,33 @@ function DisplayTodosComp({ callbackSetShowTodos, showTodos }) {
             </div>
 
             <div className="card border border-dark" hidden={showTodos}>
-                <div className="card mb-4">
-                    <div className='row'>
-                        <label className='col-sm-3'> Title: </label>
-                        <div className="col-sm-9">
-                            <input className="form-control-static" type="text" value={/*user.name || ''*/'Add to do'} readOnly />
-                        </div>
+                <Form onSubmit={handleSubmit} >
+                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextTitle">
+                        <Form.Label column sm="3">
+                            Title:
+                        </Form.Label>
+                        <Col sm="9">
+                            <Form.Control required defaultValue={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+                        </Col>
+                    </Form.Group>
+                    <div className='d-flex justify-content-end gap-2'>
+                        <Button
+                            className=''
+                            variant="outline-danger"
+                            onClick={(e) => {
+                                callbackSetShowTodos();
+                                setNewTitle('');
+                            }}
+                        > Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            variant="primary"
+                        > Add
+                        </Button>
                     </div>
-                </div>
-                <div className='d-flex justify-content-end gap-2'>
-                    <Button
-                        className=''
-                        variant="outline-danger"
-                        onClick={(e) => {
-                            callbackSetShowTodos()
-                            // routeChange()
-                        }}> Cancel
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={(e) => {
-                            callbackSetShowTodos()
-                            // routeChange()
-                        }}> Add
-                    </Button>
-                </div>
+                </Form >
             </div>
-
         </>
     )
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from 'react-bootstrap-v5';
 import { getAll } from './Rest_API/utils';
 import HomePageComp from './pages/HomePage/HomePage';
@@ -24,6 +24,8 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
+
+  const location = useLocation();
 
   // <-------------- To navigate through the pages -------------->
   function handleNavigate(e, obj) {
@@ -101,6 +103,46 @@ function App() {
     setUsersDB(newStateUsersDB);
     setUsersOnShow(newStateUsersDB);
   }
+
+  // <-------------- Update Completed Todo by todoId -------------->
+  const updateCompletedTodo = (todoId) => {
+    const newStateTodosDB = todosDB.map((todo) => {
+      if (todo.id === todoId) {
+        const todoComplete = {...todo, completed: true}
+        return todoComplete;
+      }
+      return todo;
+    });
+
+    setTodosDB(newStateTodosDB);    
+  }
+
+  // <-------------- Add New Todo -------------->
+  const addNewTodo = (newTodo) => {
+    const newId = todosDB[todosDB.length-1].id + 1;
+    const newTodo_Obj = {...newTodo, id: newId}
+
+    setTodosDB([...todosDB, newTodo_Obj]);    
+  }
+
+  useEffect(() => {
+    if (location.state){
+      const userId = location.state.selectedUser.id
+      const todosUser = todosDB.filter((todo) => todo.userId === userId);
+      
+      const isCompletedTodos = todosUser.filter((todo) => !todo.completed);
+
+      if (isCompletedTodos.length === 0) {
+        checkCompletedTodos(userId)
+      }
+
+      location.state = {...location.state, todosUser}
+      let selectingUserPath = `selectingUser`;
+      navigate(`/${selectingUserPath}`, location);
+    }
+    
+  }, [todosDB])
+
 
   // <-------------- useEffect Get All USERS -------------->
   useEffect(() => {
@@ -207,7 +249,7 @@ function App() {
             <Route path='/' element={<HomePageComp />} />
             <Route path='/addNewUser' element={<AddNewUserComp />} />
             <Route path='/updateUser' element={<UpdateUserComp callbackUpdateUser={updateUsersDB} />} />
-            <Route path='/selectingUser' element={<SelectingUserComp />} >
+            <Route path='/selectingUser' element={<SelectingUserComp callbackCompletedTodo={updateCompletedTodo} callbackAddNewTodo={addNewTodo} />} >
               <Route path='/selectingUser/displayTodos' element={<DisplayTodosComp />} />
               <Route path='/selectingUser/displayPosts' element={<DisplayPostsComp />} />
             </Route>

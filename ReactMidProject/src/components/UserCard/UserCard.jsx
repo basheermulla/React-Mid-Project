@@ -37,8 +37,10 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
 
     useEffect(() => {
         setUser(userData);
-        console.log(userIdColoredOrange);
     }, [userData])
+    useEffect(() => {
+        setIsCompleted(isUnCompleted);
+    }, [isUnCompleted])
 
     return (
         <>

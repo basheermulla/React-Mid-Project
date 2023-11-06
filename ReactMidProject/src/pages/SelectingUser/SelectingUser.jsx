@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap-v5';
 import DisplayTodosComp from '../DisplayTodos/DisplayTodos';
 import DisplayPostsComp from '../DisplayPosts/DisplayPosts';
 
-function SelectingUserComp() {
+function SelectingUserComp({ callbackCompletedTodo, callbackAddNewTodo }) {
 
     const location = useLocation();
 
@@ -31,6 +31,14 @@ function SelectingUserComp() {
         setShowPosts(true);
     }
 
+    const setCompleted = (todoId) => {
+        callbackCompletedTodo(todoId);
+    }
+
+    const addNewTodo = (newTodo) => {
+        callbackAddNewTodo(newTodo);
+    }
+
     useEffect(() => {
         console.log(location.state.selectedUser.id);
         setUser(location.state.selectedUser);
@@ -48,7 +56,12 @@ function SelectingUserComp() {
                     </div>
                 </div>
 
-                <DisplayTodosComp callbackSetShowTodos={setShow_T} showTodos={showTodos} />
+                <DisplayTodosComp
+                    callbackSetCompleted={setCompleted}
+                    callbackSetShowTodos={setShow_T}
+                    showTodos={showTodos}
+                    callbackInsertNewTodo={addNewTodo}
+                />
 
                 <div className="card mb-3 mt-5 border border-dark rounded-bottom" style={{ borderRadius: '32px', backgroundColor: '#e8eaec' }}>
                     <div className='d-flex justify-content-between'>

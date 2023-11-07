@@ -13,7 +13,6 @@ import DisplayPostsComp from './pages/DisplayPosts/DisplayPosts';
 import { POSTS_URL, TODOS_URL, USERS_URL } from './config/constants';
 import 'sweetalert2/src/sweetalert2.scss'
 
-
 function App() {
   const [usersDB, setUsersDB] = useState([]);
   const [todosDB, setTodosDB] = useState([]);

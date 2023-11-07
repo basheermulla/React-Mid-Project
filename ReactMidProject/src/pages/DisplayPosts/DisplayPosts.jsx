@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import './DisplayPosts.css';
 import { useLocation } from 'react-router-dom';
 import { Button, Form, Row, Col } from 'react-bootstrap-v5';
+import Swal from 'sweetalert2';
+import 'sweetalert2/src/sweetalert2.scss';
 
 function DisplayPostsComp({ callbackSetShowPosts, showPosts, callbackInsertNewPost }) {
     const [user, setUser] = useState({});
@@ -26,7 +28,14 @@ function DisplayPostsComp({ callbackSetShowPosts, showPosts, callbackInsertNewPo
             body: newBody
         }
 
-        console.log(post);
+        Swal.fire({
+            position: "top-end",
+            type: "success",
+            title: "Your post has been added",
+            showConfirmButton: false,
+            timer: 1500
+        });
+
         setNewTitle('');
         setNewBody('');
         e.target.reset();

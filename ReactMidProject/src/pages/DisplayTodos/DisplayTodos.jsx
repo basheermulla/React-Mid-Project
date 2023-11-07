@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import './DisplayTodos.css';
 import { useLocation } from 'react-router-dom';
 import { Button, Form, Row, Col } from 'react-bootstrap-v5';
+import Swal from 'sweetalert2';
+import 'sweetalert2/src/sweetalert2.scss';
 
 function DisplayTodosComp({ callbackSetCompleted, callbackSetShowTodos, showTodos, callbackInsertNewTodo }) {
     const [user, setUser] = useState({});
@@ -25,7 +27,14 @@ function DisplayTodosComp({ callbackSetCompleted, callbackSetShowTodos, showTodo
             completed: false
         }
 
-        console.log(todo);
+        Swal.fire({
+            position: "top-end",
+            type: "success",
+            title: "Your todo has been added",
+            showConfirmButton: false,
+            timer: 1500
+        });
+
         setNewTitle('')
         e.target.reset();
 

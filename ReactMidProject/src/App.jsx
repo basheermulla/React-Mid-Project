@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { Button } from 'react-bootstrap-v5';
+import { Button, Container, Navbar } from 'react-bootstrap-v5';
 import { getAll } from './Rest_API/utils';
 import HomePageComp from './pages/HomePage/HomePage';
 import AddNewUserComp from './pages/AddNewUser/AddNewUser';
@@ -12,13 +12,13 @@ import DisplayTodosComp from './pages/DisplayTodos/DisplayTodos';
 import DisplayPostsComp from './pages/DisplayPosts/DisplayPosts';
 import { POSTS_URL, TODOS_URL, USERS_URL } from './config/constants';
 import 'sweetalert2/src/sweetalert2.scss'
+import reactLogo from './assets/react.svg'
 
 function App() {
   const [usersDB, setUsersDB] = useState([]);
   const [todosDB, setTodosDB] = useState([]);
   const [postsDB, setPostsDB] = useState([]);
   const [userIdColoredOrange, setUserIdColoredOrange] = useState('');
-
   const [usersOnShow, setUsersOnShow] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -33,31 +33,29 @@ function App() {
       setUserIdColoredOrange('');
     }
     switch (nav) {
-      case 'Add':
+      case 'Add': // <--- Add New User --->
         navigate("/addNewUser");
         break;
-      case 'Update':
+      case 'Update': // <--- Update User --->
         let updatePath = `updateUser`;
         const updateUser = obj;
         const updateData = { state: { updateUser } };
         navigate(`/${updatePath}`, updateData);
         break;
-      case 'Delete':
+      case 'Delete': // <--- Delete User --->
         deleteUserFromUsersDB(obj.id);
         break;
-      case `ID: ${obj.id}`: // Selecting User - Posts & Todos Are Presented
+      case `ID: ${obj.id}`: // <--- Selecting User - Posts & Todos Are Presented --->
         let selectingUserPath = `selectingUser`;
         const selectedUser = obj;
         const postsUser = postsDB.filter((post) => post.userId === selectedUser.id);
         const todosUser = todosDB.filter((todo) => todo.userId === selectedUser.id);
-
         controlRegionColoredOrange(selectedUser.id);
-
         const selectedData = { state: { selectedUser, postsUser, todosUser } };
         navigate(`/${selectingUserPath}`, selectedData);
         break;
       default:
-        navigate("/");
+        navigate("/"); // <--- Home Page --->
         break;
     }
   }
@@ -71,11 +69,13 @@ function App() {
 
   // <-------------- To control the Region Colored Orange  -------------->
   const controlRegionColoredOrange = (userId) => {
+    // Update state
     setUserIdColoredOrange(userId);
   }
 
   // <-------------- To view the search term input -------------->
   const handleSearch = (e) => {
+    // Update state
     setSearchTerm(e.target.value);
   }
 
@@ -88,7 +88,6 @@ function App() {
         return user;
       }
     });
-
     // Update state
     setUsersDB(newStateUsersDB);
     setUsersOnShow(newStateUsersDB);
@@ -97,7 +96,6 @@ function App() {
   // <-------------- Update Data Base after DELETE a particular User -------------->
   const deleteUserFromUsersDB = (userId) => {
     const newStateUsersDB = usersDB.filter((user) => user.id !== userId);
-
     // Update state
     setUsersDB(newStateUsersDB);
     setUsersOnShow(newStateUsersDB);
@@ -112,7 +110,7 @@ function App() {
       }
       return todo;
     });
-
+    // Update state
     setTodosDB(newStateTodosDB);
   }
 
@@ -120,7 +118,7 @@ function App() {
   const addNewTodo = (newTodo) => {
     const newId = todosDB[todosDB.length - 1].id + 1;
     const newTodo_Obj = { ...newTodo, id: newId }
-
+    // Update state
     setTodosDB([...todosDB, newTodo_Obj]);
   }
 
@@ -128,10 +126,20 @@ function App() {
   const addNewPost = (newPost) => {
     const newId = postsDB[postsDB.length - 1].id + 1;
     const newPost_Obj = { ...newPost, id: newId }
-
+    // Update state
     setPostsDB([...postsDB, newPost_Obj]);
   }
 
+  // <-------------- Add New Post -------------->
+  const addNewUser = (newUser) => {
+    const newId = usersDB[usersDB.length - 1].id + 1;
+    const newUser_Obj = { ...newUser, id: newId }
+    // Update state
+    setUsersDB([...usersDB, newUser_Obj]);
+    setUsersOnShow([...usersDB, newUser_Obj]);
+  }
+
+  // <-------------- useEffect Update location.state for todosUser -------------->
   useEffect(() => {
     if (location.state) {
       const userId = location.state.selectedUser.id
@@ -148,7 +156,9 @@ function App() {
       navigate(`/${selectingUserPath}`, location);
     }
 
-  }, [todosDB])
+  }, [todosDB]);
+
+  // <-------------- useEffect Update location.state for postsUser -------------->
   useEffect(() => {
     console.log(postsDB);
     if (location.state) {
@@ -159,13 +169,23 @@ function App() {
       let selectingUserPath = `selectingUser`;
       navigate(`/${selectingUserPath}`, location);
     }
-  }, [postsDB])
+  }, [postsDB]);
+
+  // <-------------- useEffect Search -------------->
+  useEffect(() => {
+    // Filter users to show
+    const results = usersDB.filter(user => {
+      const lowerCase_Search = searchTerm.toLowerCase();
+      const lowerCase_Name = user.name.toLowerCase();
+      const lowerCase_Email = user.email.toLowerCase();
+      return lowerCase_Name.includes(lowerCase_Search) || lowerCase_Email.includes(lowerCase_Search)
+    });
+
+    setUsersOnShow(results);
+  }, [searchTerm]);
 
   // <-------------- useEffect Get All USERS -------------->
   useEffect(() => {
-    // // storing input name
-    // localStorage.setItem("name", JSON.stringify(name));
-
     // Get All Users =>>  <<--- Rest API called utils.js --->>
     const getAllUsers = async () => {
       const { data } = await getAll(USERS_URL);
@@ -210,36 +230,36 @@ function App() {
     getAllPosts();
   }, []);
 
-  // <-------------- useEffect Search -------------->
-  useEffect(() => {
-    // Filter users to show
-    const results = usersDB.filter(user => {
-      const lowerCase_Search = searchTerm.toLowerCase();
-      const lowerCase_Name = user.name.toLowerCase();
-      const lowerCase_Email = user.email.toLowerCase();
-      return lowerCase_Name.includes(lowerCase_Search) || lowerCase_Email.includes(lowerCase_Search)
-    });
-
-    setUsersOnShow(results);
-  }, [searchTerm]);
-
   return (
     <>
-      <div className="p-5 text-white text-center bg-dark" /*style={{ backgroundColor: '#3083cb' }}*/>
-        <h1>My React Application</h1>
+      {/*---------------------------------------- Header ----------------------------------------*/}
+      <div className="p-5 text-white text-center bg-dark" >
+        <Container>
+          <Navbar.Brand href='#' onClick={(e) => handleNavigate(e, { id: -1 })} className='justify-content-end flex-grow-1 '>
+            <img
+              alt=""
+              src={reactLogo}
+              width="50"
+              height="50"
+              className="d-inline-block align-top"
+            />{' '}
+            <h2>My React Application</h2>
+          </Navbar.Brand>
+        </Container>
         <p>This is the My Mid Project of React course!</p>
       </div>
-      <nav className="navbar navbar-light bg-danger" /*style={{ backgroundColor: '#aed6f0' }}*/>
+      {/*---------------------------------------- Navbar ----------------------------------------*/}
+      <nav className="navbar navbar-light bg-danger" >
         <div className="container-fluid col-sm-4">
           <form className="d-flex">
             <input className="form-control me-5" type="search" placeholder="Search" onChange={handleSearch} />
           </form>
         </div>
         <div className="container-fluid col-sm-8">
-          <Button variant="light" onClick={handleNavigate}> Add </Button><br /><br />
+          <Button variant="info" onClick={(e) => handleNavigate(e, { id: -1 })}> <b>Add</b> </Button><br /><br />
         </div>
       </nav>
-
+      {/*---------------------------------------- Container ----------------------------------------*/}
       <div className="container mt-5">
         <div className="row">
           <div className="col-sm-7">
@@ -264,25 +284,23 @@ function App() {
           </div>
           <Routes>
             <Route path='/' element={<HomePageComp />} />
-            <Route path='/addNewUser' element={<AddNewUserComp />} />
+            <Route path='/addNewUser' element={<AddNewUserComp callbackNewUser={addNewUser} />} />
             <Route path='/updateUser' element={<UpdateUserComp callbackUpdateUser={updateUsersDB} />} />
             <Route
               path='/selectingUser'
-              element={
-                <SelectingUserComp
-                  callbackCompletedTodo={updateCompletedTodo}
-                  callbackAddNewTodo={addNewTodo}
-                  callbackAddNewPost={addNewPost}
-                />
-              }
-            >
+              element={<SelectingUserComp
+                callbackCompletedTodo={updateCompletedTodo}
+                callbackAddNewTodo={addNewTodo}
+                callbackAddNewPost={addNewPost}
+              />
+              }>
               <Route path='/selectingUser/displayTodos' element={<DisplayTodosComp />} />
               <Route path='/selectingUser/displayPosts' element={<DisplayPostsComp />} />
             </Route>
           </Routes>
         </div>
       </div>
-
+      {/*---------------------------------------- Footer ----------------------------------------*/}
       <div className="mt-5 p-4 text-white text-center bg-dark" /*style={{ backgroundColor: '#3083cb' }}*/>
         <h4>Footer</h4>
       </div>

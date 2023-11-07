@@ -8,7 +8,6 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
     const [user, setUser] = useState({});
     const [showOtherData, setShowOtherData] = useState(false);
     const [isCompleted, setIsCompleted] = useState(isUnCompleted);
-    // const [isSelectingUser, setIsSelectingUser] = useState(false);
 
     const handleNavigate = (event) => {
         callbackNavigate(event, user);
@@ -53,7 +52,6 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
                 <div className='row'>
                     <div className='col-sm-2'>
                         <label className='displayInLine_label' value="Hi" onClick={(e) => {
-                            // setIsSelectingUser(e);
                             handleNavigate(e)
                         }}> ID: {user.id} </label>
                     </div>
@@ -113,7 +111,7 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
                 </div >
                 <div className='row flex-row-reverse'>
                     <div className='col-sm-2' hidden={!showOtherData}>
-                        <Button variant="danger" onClick={(e) => handleNavigate(e)}> Delete </Button>
+                        <Button variant="danger" onClick={(e) => handleDelete(e)}> Delete </Button>
                     </div>
                     <div className='col-sm-2' hidden={!showOtherData}>
                         <Button variant="info" onClick={(e) => handleNavigate(e)}> Update </Button>

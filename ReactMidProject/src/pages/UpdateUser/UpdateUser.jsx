@@ -2,6 +2,9 @@ import { useState } from 'react';
 import './UpdateUser.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap-v5';
+import Swal from 'sweetalert2';
+import 'sweetalert2/src/sweetalert2.scss';
+
 
 function UpdateUserComp({ callbackUpdateUser }) {
     const [user, setUser] = useState(useLocation().state.updateUser);
@@ -16,8 +19,23 @@ function UpdateUserComp({ callbackUpdateUser }) {
             e.stopPropagation();
         }
 
-        callbackUpdateUser(user);
-        routeChange();
+        Swal.fire({
+            title: "Do you want to save the changes?",
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonText: "Save",
+            cancelButtonText: `Don't save`
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            console.log(result);
+            if (result.value) {
+                callbackUpdateUser(user);
+                routeChange();
+                Swal.fire("Saved!", "", "success");
+            } else if (result.dismiss) {
+                Swal.fire("Changes are not saved", "", "info");
+            }
+        });
     }
 
     const routeChange = () => {
@@ -61,7 +79,7 @@ function UpdateUserComp({ callbackUpdateUser }) {
                         <br />
                         <Button variant="outline-danger" onClick={routeChange}> Back </Button>
                         {' '}
-                        <Button variant="outline-primary" type="submit"> Update </Button>
+                        <Button variant="primary" type="submit"> Update </Button>
                     </Form>
                 </div>
             </div >

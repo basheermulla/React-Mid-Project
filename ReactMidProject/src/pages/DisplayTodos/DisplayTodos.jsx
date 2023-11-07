@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './DisplayTodos.css';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Button, Form, Row, Col } from 'react-bootstrap-v5';
 
 function DisplayTodosComp({ callbackSetCompleted, callbackSetShowTodos, showTodos, callbackInsertNewTodo }) {
@@ -9,8 +9,6 @@ function DisplayTodosComp({ callbackSetCompleted, callbackSetShowTodos, showTodo
     const [newTitle, setNewTitle] = useState('');
 
     const location = useLocation().state;
-
-    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();

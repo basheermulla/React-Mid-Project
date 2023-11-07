@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap-v5';
 import DisplayTodosComp from '../DisplayTodos/DisplayTodos';
 import DisplayPostsComp from '../DisplayPosts/DisplayPosts';
 
-function SelectingUserComp({ callbackCompletedTodo, callbackAddNewTodo }) {
+function SelectingUserComp({ callbackCompletedTodo, callbackAddNewTodo, callbackAddNewPost }) {
 
     const location = useLocation();
 
@@ -34,9 +34,13 @@ function SelectingUserComp({ callbackCompletedTodo, callbackAddNewTodo }) {
     const setCompleted = (todoId) => {
         callbackCompletedTodo(todoId);
     }
-
+    
     const addNewTodo = (newTodo) => {
         callbackAddNewTodo(newTodo);
+    }
+
+    const addNewPost = (newPost) => {
+        callbackAddNewPost(newPost);
     }
 
     useEffect(() => {
@@ -69,7 +73,11 @@ function SelectingUserComp({ callbackCompletedTodo, callbackAddNewTodo }) {
                         <Button variant="primary" onClick={addPost}> Add Post </Button>
                     </div>
                 </div>
-                <DisplayPostsComp callbackSetShowPosts={setShow_P} showPosts={showPosts} />
+                <DisplayPostsComp
+                    callbackSetShowPosts={setShow_P}
+                    showPosts={showPosts}
+                    callbackInsertNewPost={addNewPost}
+                />
                 <br />
             </div>
 

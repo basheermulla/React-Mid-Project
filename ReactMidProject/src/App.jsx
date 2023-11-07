@@ -107,41 +107,59 @@ function App() {
   const updateCompletedTodo = (todoId) => {
     const newStateTodosDB = todosDB.map((todo) => {
       if (todo.id === todoId) {
-        const todoComplete = {...todo, completed: true}
+        const todoComplete = { ...todo, completed: true }
         return todoComplete;
       }
       return todo;
     });
 
-    setTodosDB(newStateTodosDB);    
+    setTodosDB(newStateTodosDB);
   }
 
   // <-------------- Add New Todo -------------->
   const addNewTodo = (newTodo) => {
-    const newId = todosDB[todosDB.length-1].id + 1;
-    const newTodo_Obj = {...newTodo, id: newId}
+    const newId = todosDB[todosDB.length - 1].id + 1;
+    const newTodo_Obj = { ...newTodo, id: newId }
 
-    setTodosDB([...todosDB, newTodo_Obj]);    
+    setTodosDB([...todosDB, newTodo_Obj]);
+  }
+
+  // <-------------- Add New Post -------------->
+  const addNewPost = (newPost) => {
+    const newId = postsDB[postsDB.length - 1].id + 1;
+    const newPost_Obj = { ...newPost, id: newId }
+
+    setPostsDB([...postsDB, newPost_Obj]);
   }
 
   useEffect(() => {
-    if (location.state){
+    if (location.state) {
       const userId = location.state.selectedUser.id
       const todosUser = todosDB.filter((todo) => todo.userId === userId);
-      
+
       const isCompletedTodos = todosUser.filter((todo) => !todo.completed);
 
       if (isCompletedTodos.length === 0) {
         checkCompletedTodos(userId)
       }
 
-      location.state = {...location.state, todosUser}
+      location.state = { ...location.state, todosUser }
       let selectingUserPath = `selectingUser`;
       navigate(`/${selectingUserPath}`, location);
     }
-    
-  }, [todosDB])
 
+  }, [todosDB])
+  useEffect(() => {
+    console.log(postsDB);
+    if (location.state) {
+      const userId = location.state.selectedUser.id
+      const postsUser = postsDB.filter((post) => post.userId === userId);
+
+      location.state = { ...location.state, postsUser }
+      let selectingUserPath = `selectingUser`;
+      navigate(`/${selectingUserPath}`, location);
+    }
+  }, [postsDB])
 
   // <-------------- useEffect Get All USERS -------------->
   useEffect(() => {
@@ -248,7 +266,16 @@ function App() {
             <Route path='/' element={<HomePageComp />} />
             <Route path='/addNewUser' element={<AddNewUserComp />} />
             <Route path='/updateUser' element={<UpdateUserComp callbackUpdateUser={updateUsersDB} />} />
-            <Route path='/selectingUser' element={<SelectingUserComp callbackCompletedTodo={updateCompletedTodo} callbackAddNewTodo={addNewTodo} />} >
+            <Route
+              path='/selectingUser'
+              element={
+                <SelectingUserComp
+                  callbackCompletedTodo={updateCompletedTodo}
+                  callbackAddNewTodo={addNewTodo}
+                  callbackAddNewPost={addNewPost}
+                />
+              }
+            >
               <Route path='/selectingUser/displayTodos' element={<DisplayTodosComp />} />
               <Route path='/selectingUser/displayPosts' element={<DisplayPostsComp />} />
             </Route>

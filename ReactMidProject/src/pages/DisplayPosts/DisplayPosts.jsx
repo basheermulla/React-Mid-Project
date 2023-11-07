@@ -1,20 +1,47 @@
 import { useEffect, useState } from 'react';
 import './DisplayPosts.css';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from 'react-bootstrap-v5';
+import { useLocation } from 'react-router-dom';
+import { Button, Form, Row, Col } from 'react-bootstrap-v5';
 
-function DisplayPostsComp({ callbackSetShowPosts, showPosts }) {
+function DisplayPostsComp({ callbackSetShowPosts, showPosts, callbackInsertNewPost }) {
     const [user, setUser] = useState({});
     const [posts, setPosts] = useState([]);
+    const [newTitle, setNewTitle] = useState('');
+    const [newBody, setNewBody] = useState('');
 
     const location = useLocation().state;
 
-    const navigate = useNavigate();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        console.log(form.checkValidity());
+        if (form.checkValidity() === false) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
+        const post = {
+            userId: user.id,
+            title: newTitle,
+            body: newBody
+        }
+
+        console.log(post);
+        setNewTitle('');
+        setNewBody('');
+        e.target.reset();
+
+        callbackInsertNewPost(post);
+        callbackSetShowPosts();
+    }
     useEffect(() => {
         setUser(location.selectedUser);
         setPosts(location.postsUser);
-    }, [location.selectedUser.id])
+    }, [location.selectedUser.id]);
+
+    useEffect(() => {
+        setPosts(location.postsUser);
+    }, [location.postsUser]);
 
     return (
         <>
@@ -40,39 +67,41 @@ function DisplayPostsComp({ callbackSetShowPosts, showPosts }) {
             </div>
 
             <div className="card border border-dark" hidden={showPosts}>
-                <div className="card mb-4">
-                    <div className='row mb-4'>
-                        <label className='col-sm-3'> Title: </label>
-                        <div className="col-sm-9">
-                            <input className="form-control-static" type="text" value={/*user.name || ''*/'Add Title Post'} readOnly />
-                        </div>
+                <Form onSubmit={handleSubmit} >
+                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextTitle">
+                        <Form.Label column sm="3">
+                            Title:
+                        </Form.Label>
+                        <Col sm="9">
+                            <Form.Control required defaultValue={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextBody">
+                        <Form.Label column sm="3">
+                            Body:
+                        </Form.Label>
+                        <Col sm="9">
+                            <Form.Control required defaultValue={newBody} onChange={(e) => setNewBody(e.target.value)} />
+                        </Col>
+                    </Form.Group>
+                    <div className='d-flex justify-content-end gap-2'>
+                        <Button
+                            variant="outline-danger"
+                            onClick={(e) => {
+                                callbackSetShowPosts();
+                                setNewTitle('');
+                                setNewBody('');
+                            }}
+                        > Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            variant="primary"
+                        > Add
+                        </Button>
                     </div>
-                    <div className='row'>
-                        <label className='col-sm-3'> Body: </label>
-                        <div className="col-sm-9">
-                            <input className="form-control-static" type="text" value={/*user.name || ''*/'Add Body Post'} readOnly />
-                        </div>
-                    </div>
-                </div>
-                <div className='d-flex justify-content-end gap-2'>
-                    <Button
-                        className=''
-                        variant="outline-danger"
-                        onClick={(e) => {
-                            callbackSetShowPosts()
-                            // routeChange()
-                        }}> Cancel
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={(e) => {
-                            callbackSetShowPosts()
-                            // routeChange()
-                        }}> Add
-                    </Button>
-                </div>
+                </Form >
             </div>
-
         </>
     )
 }

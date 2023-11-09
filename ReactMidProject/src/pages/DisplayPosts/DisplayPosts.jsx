@@ -11,12 +11,11 @@ function DisplayPostsComp({ callbackSetShowPosts, showPosts, callbackInsertNewPo
     const [newTitle, setNewTitle] = useState('');
     const [newBody, setNewBody] = useState('');
 
-    const location = useLocation().state;
+    const { state } = useLocation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        console.log(form.checkValidity());
         if (form.checkValidity() === false) {
             e.preventDefault();
             e.stopPropagation();
@@ -42,31 +41,40 @@ function DisplayPostsComp({ callbackSetShowPosts, showPosts, callbackInsertNewPo
 
         callbackInsertNewPost(post);
         callbackSetShowPosts();
+        addNewPost(post);
     }
-    useEffect(() => {
-        setUser(location.selectedUser);
-        setPosts(location.postsUser);
-    }, [location.selectedUser.id]);
+
+    // <-------------- Add New Post -------------->
+    const addNewPost = (newPost) => {
+        let newId = 0;
+        if (posts[posts.length - 1]) {
+            newId = posts[posts.length - 1].id + 1;
+        }
+        const newPost_Obj = { ...newPost, id: newId };
+        // Update state
+        state.postsUser = [...posts, newPost_Obj];
+    }
 
     useEffect(() => {
-        setPosts(location.postsUser);
-    }, [location.postsUser]);
+        setUser(state?.selectedUser);
+        setPosts(state?.postsUser);
+    }, [state?.postsUser]);
 
     return (
         <>
             <div className="card border border-dark" hidden={!showPosts}>
                 {
                     posts && posts.map((post) => {
-                        return <div className="card mb-4" key={post.id}>
+                        return <div className="card mb-4" key={post?.id}>
                             <div className='row'>
-                                <label className='col-sm-2'> Title: </label>
-                                <div className="col-sm-10">
+                                <label className='col-sm-3'> Title: </label>
+                                <div className="col-sm-9">
                                     <label> {post.title || ''} </label>
                                 </div>
                             </div>
                             <div className='row'>
-                                <label className='col-sm-2 col-form-label'> Body: </label>
-                                <div className="col-sm-10">
+                                <label className='col-sm-3 col-form-label'> Body: </label>
+                                <div className="col-sm-9">
                                     <label className='col-form-label'> {post.body} </label>
                                 </div>
                             </div>

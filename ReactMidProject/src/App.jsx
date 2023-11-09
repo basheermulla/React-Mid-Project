@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Button, Container, Navbar } from 'react-bootstrap-v5';
 import { getAll } from './Rest_API/utils';
 import HomePageComp from './pages/HomePage/HomePage';
@@ -13,6 +13,7 @@ import DisplayPostsComp from './pages/DisplayPosts/DisplayPosts';
 import { POSTS_URL, TODOS_URL, USERS_URL } from './config/constants';
 import 'sweetalert2/src/sweetalert2.scss'
 import reactLogo from './assets/react.svg'
+import InvalidPath from './pages/InvalidPath/InvalidPath';
 
 function App() {
   const [usersDB, setUsersDB] = useState([]);
@@ -21,10 +22,9 @@ function App() {
   const [userIdColoredOrange, setUserIdColoredOrange] = useState('');
   const [usersOnShow, setUsersOnShow] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [invalidPath, setInvalidPath] = useState(false);
 
   const navigate = useNavigate();
-
-  const location = useLocation();
 
   // <-------------- To navigate through the pages -------------->
   function handleNavigate(e, obj) {
@@ -52,10 +52,11 @@ function App() {
         const todosUser = todosDB.filter((todo) => todo.userId === selectedUser.id);
         controlRegionColoredOrange(selectedUser.id);
         const selectedData = { state: { selectedUser, postsUser, todosUser } };
-        navigate(`/${selectingUserPath}`, selectedData);
+        navigate(`/${selectingUserPath}/${selectedUser.id}`, selectedData);
         break;
       default:
-        navigate("/"); // <--- Home Page --->
+        setInvalidPath(false);
+        navigate('/', {}); // <--- Home Page --->
         break;
     }
   }
@@ -93,12 +94,17 @@ function App() {
     setUsersOnShow(newStateUsersDB);
   }
 
-  // <-------------- Update Data Base after DELETE a particular User -------------->
+  // <-------------- Update Data Base after DELETE a particular User and all user's data like todos and posts -------------->
   const deleteUserFromUsersDB = (userId) => {
     const newStateUsersDB = usersDB.filter((user) => user.id !== userId);
+    const newStateTodosDB = todosDB.filter((todo) => todo.userId !== userId);
+    const newStatePostsDB = postsDB.filter((post) => post.userId !== userId);
     // Update state
     setUsersDB(newStateUsersDB);
     setUsersOnShow(newStateUsersDB);
+    setTodosDB(newStateTodosDB);
+    setPostsDB(newStatePostsDB);
+    navigate("/", {});
   }
 
   // <-------------- Update Completed Todo by todoId -------------->
@@ -116,60 +122,38 @@ function App() {
 
   // <-------------- Add New Todo -------------->
   const addNewTodo = (newTodo) => {
-    const newId = todosDB[todosDB.length - 1].id + 1;
-    const newTodo_Obj = { ...newTodo, id: newId }
+    let newId = 1;
+    if (todosDB[todosDB.length - 1]) {
+      newId = todosDB[todosDB.length - 1].id + 1;
+    }
+
+    const newTodo_Obj = { ...newTodo, id: newId };
     // Update state
     setTodosDB([...todosDB, newTodo_Obj]);
   }
 
   // <-------------- Add New Post -------------->
   const addNewPost = (newPost) => {
-    const newId = postsDB[postsDB.length - 1].id + 1;
-    const newPost_Obj = { ...newPost, id: newId }
+    let newId = 1;
+    if (postsDB[postsDB.length - 1]) {
+      newId = postsDB[postsDB.length - 1].id + 1;
+    }
+    const newPost_Obj = { ...newPost, id: newId };
     // Update state
     setPostsDB([...postsDB, newPost_Obj]);
   }
 
   // <-------------- Add New Post -------------->
   const addNewUser = (newUser) => {
-    const newId = usersDB[usersDB.length - 1].id + 1;
+    let newId = 1;
+    if (usersDB[usersDB.length - 1]) {
+      newId = usersDB[usersDB.length - 1].id + 1;
+    }
     const newUser_Obj = { ...newUser, id: newId }
     // Update state
     setUsersDB([...usersDB, newUser_Obj]);
     setUsersOnShow([...usersDB, newUser_Obj]);
   }
-
-  // <-------------- useEffect Update location.state for todosUser -------------->
-  useEffect(() => {
-    if (location.state) {
-      const userId = location.state.selectedUser.id
-      const todosUser = todosDB.filter((todo) => todo.userId === userId);
-
-      const isCompletedTodos = todosUser.filter((todo) => !todo.completed);
-
-      if (isCompletedTodos.length === 0) {
-        checkCompletedTodos(userId)
-      }
-
-      location.state = { ...location.state, todosUser }
-      let selectingUserPath = `selectingUser`;
-      navigate(`/${selectingUserPath}`, location);
-    }
-
-  }, [todosDB]);
-
-  // <-------------- useEffect Update location.state for postsUser -------------->
-  useEffect(() => {
-    console.log(postsDB);
-    if (location.state) {
-      const userId = location.state.selectedUser.id
-      const postsUser = postsDB.filter((post) => post.userId === userId);
-
-      location.state = { ...location.state, postsUser }
-      let selectingUserPath = `selectingUser`;
-      navigate(`/${selectingUserPath}`, location);
-    }
-  }, [postsDB]);
 
   // <-------------- useEffect Search -------------->
   useEffect(() => {
@@ -260,7 +244,7 @@ function App() {
         </div>
       </nav>
       {/*---------------------------------------- Container ----------------------------------------*/}
-      <div className="container mt-5">
+      <div className="container mt-5" hidden={invalidPath}>
         <div className="row">
           <div className="col-sm-7">
             <div className='card mb-3 border border-dark rounded-bottom' style={{ borderRadius: '32px', backgroundColor: '#e8eaec' }}>
@@ -270,7 +254,7 @@ function App() {
             </div>
             <div className='card mb-3 border border-dark'>
               {
-                usersOnShow && usersOnShow.length > 0 ? usersOnShow.map((user) => {
+                (usersOnShow && usersOnShow.length > 0) ? usersOnShow.map((user) => {
                   return <UserCardComp
                     userData={user}
                     key={user.id}
@@ -286,22 +270,24 @@ function App() {
             <Route path='/' element={<HomePageComp />} />
             <Route path='/addNewUser' element={<AddNewUserComp callbackNewUser={addNewUser} />} />
             <Route path='/updateUser' element={<UpdateUserComp callbackUpdateUser={updateUsersDB} />} />
+            <Route path='*' element={<InvalidPath callbackInvalidPath={(path) => setInvalidPath(path)} />} />
             <Route
-              path='/selectingUser'
+              path='/selectingUser/:id'
               element={<SelectingUserComp
                 callbackCompletedTodo={updateCompletedTodo}
                 callbackAddNewTodo={addNewTodo}
                 callbackAddNewPost={addNewPost}
               />
               }>
-              <Route path='/selectingUser/displayTodos' element={<DisplayTodosComp />} />
-              <Route path='/selectingUser/displayPosts' element={<DisplayPostsComp />} />
+              <Route path='displayTodos' element={<DisplayTodosComp />} />
+              <Route path='displayPosts' element={<DisplayPostsComp />} />
             </Route>
+
           </Routes>
         </div>
       </div>
       {/*---------------------------------------- Footer ----------------------------------------*/}
-      <div className="mt-5 p-4 text-white text-center bg-dark" /*style={{ backgroundColor: '#3083cb' }}*/>
+      <div className="mt-5 p-4 text-white text-center bg-dark" hidden={invalidPath}>
         <h4>Footer</h4>
       </div>
     </>

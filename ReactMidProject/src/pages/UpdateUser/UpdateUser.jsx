@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './UpdateUser.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap-v5';
 import Swal from 'sweetalert2';
 import 'sweetalert2/src/sweetalert2.scss';
 
-
 function UpdateUserComp({ callbackUpdateUser }) {
     const [user, setUser] = useState(useLocation().state.updateUser);
+    const updateRef = useRef(null);
+
+    const location = useLocation().state;
 
     let navigate = useNavigate();
 
@@ -26,12 +28,17 @@ function UpdateUserComp({ callbackUpdateUser }) {
             confirmButtonText: "Save",
             cancelButtonText: `Don't save`
         }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
             console.log(result);
             if (result.value) {
                 callbackUpdateUser(user);
                 routeChange();
-                Swal.fire("Saved!", "", "success");
+                Swal.fire({
+                    position: "center",
+                    type: "success",
+                    title: "Your user has been Saved",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             } else if (result.dismiss) {
                 Swal.fire("Changes are not saved", "", "info");
             }
@@ -43,36 +50,67 @@ function UpdateUserComp({ callbackUpdateUser }) {
         navigate(path);
     }
 
+    useEffect(() => {
+        setUser(location.updateUser);
+        updateRef.current.focus();
+    }, [location.updateUser.id]);
+
     return (
         <>
             <div className="col-sm-5">
                 <div className='card mb-3 border border-dark rounded-bottom' style={{ borderRadius: '32px', backgroundColor: '#e8eaec' }}>
                     <div className='d-flex justify-content-center'>
-                        <h3> Update User </h3>
+                        <h3> Update User {user.id} </h3>
                     </div>
                 </div>
                 <div className='row'>
                     <Form onSubmit={handleSubmit}>
                         <div className='card border border-dark'>
-                            <Form.Group className="mb-3" onChange={(e) => setUser({ ...user, name: e.target.value })} controlId="exampleForm.ControlInput1">
+                            <Form.Group className="mb-3" controlId="Form.ControlInputName">
                                 <Form.Label> Name </Form.Label>
-                                <Form.Control required type="text" placeholder="Name" defaultValue={user['name']} />
+                                <Form.Control
+                                    required
+                                    ref={updateRef}
+                                    type="text"
+                                    value={user.name}
+                                    onChange={(e) => setUser({ ...user, name: e.target.value })}
+                                />
                             </Form.Group>
-                            <Form.Group className="mb-3" onChange={(e) => setUser({ ...user, email: e.target.value })} controlId="exampleForm.ControlInput1">
+                            <Form.Group className="mb-3" controlId="Form.ControlInputEmail">
                                 <Form.Label> Email </Form.Label>
-                                <Form.Control required type="email" placeholder="Email" defaultValue={user['email']} />
+                                <Form.Control
+                                    required
+                                    type="email"
+                                    value={user.email}
+                                    onChange={(e) => setUser({ ...user, email: e.target.value })}
+                                />
                             </Form.Group>
-                            <Form.Group className="mb-3" onChange={(e) => setUser({ ...user, address: { ...user.address, street: e.target.value } })} controlId="exampleForm.ControlInput1">
+                            <Form.Group className="mb-3" controlId="Form.ControlInputStreet">
                                 <Form.Label> Street </Form.Label>
-                                <Form.Control required type="text" placeholder="Street" defaultValue={user.address['street']} />
+                                <Form.Control
+                                    required
+                                    type="text"
+                                    value={user.address.street}
+                                    onChange={(e) => setUser({ ...user, address: { ...user.address, street: e.target.value } })}
+                                />
                             </Form.Group>
-                            <Form.Group className="mb-3" onChange={(e) => setUser({ ...user, address: { ...user.address, city: e.target.value } })} controlId="exampleForm.ControlInput1">
+                            <Form.Group className="mb-3" controlId="Form.ControlInputCity">
                                 <Form.Label> City </Form.Label>
-                                <Form.Control required type="text" placeholder="City" defaultValue={user.address['city']} />
+                                <Form.Control
+                                    required
+                                    type="text"
+                                    value={user.address.city}
+                                    onChange={(e) => setUser({ ...user, address: { ...user.address, city: e.target.value } })}
+                                />
                             </Form.Group>
-                            <Form.Group className="mb-3" onChange={(e) => setUser({ ...user, address: { ...user.address, zipcode: e.target.value } })} controlId="exampleForm.ControlInput1">
+                            <Form.Group className="mb-3" controlId="Form.ControlInputZipCode">
                                 <Form.Label> Zip Code </Form.Label>
-                                <Form.Control required type="text" placeholder="Zip Code" defaultValue={user.address['zipcode']} />
+                                <Form.Control
+                                    required
+                                    type="text"
+                                    value={user.address.zipcode}
+                                    onChange={(e) => setUser({ ...user, address: { ...user.address, zipcode: e.target.value } })}
+                                />
                             </Form.Group>
                             <br />
                         </div>

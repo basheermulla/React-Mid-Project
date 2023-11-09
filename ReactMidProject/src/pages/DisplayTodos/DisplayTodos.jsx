@@ -10,12 +10,11 @@ function DisplayTodosComp({ callbackSetCompleted, callbackSetShowTodos, showTodo
     const [todos, setTodos] = useState([]);
     const [newTitle, setNewTitle] = useState('');
 
-    const location = useLocation().state;
+    const { state } = useLocation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        console.log(form.checkValidity());
         if (form.checkValidity() === false) {
             e.preventDefault();
             e.stopPropagation();
@@ -40,16 +39,24 @@ function DisplayTodosComp({ callbackSetCompleted, callbackSetShowTodos, showTodo
 
         callbackInsertNewTodo(todo);
         callbackSetShowTodos();
+        addNewTodo(todo);
+    }
+
+    // <-------------- Add New Todo -------------->
+    const addNewTodo = (newTodo) => {
+        let newId = 0;
+        if (todos[todos.length - 1]) {
+            newId = todos[todos.length - 1].id + 1;
+        }
+        const newTodo_Obj = { ...newTodo, id: newId };
+        // Update state
+        state.todosUser = [...todos, newTodo_Obj];
     }
 
     useEffect(() => {
-        setUser(location.selectedUser);
-        setTodos(location.todosUser);
-    }, [location.selectedUser.id]);
-
-    useEffect(() => {
-        setTodos(location.todosUser);
-    }, [location.todosUser])
+        setUser(state?.selectedUser);
+        setTodos(state?.todosUser);
+    }, [state?.todosUser]);
 
     return (
         <>
@@ -69,7 +76,10 @@ function DisplayTodosComp({ callbackSetCompleted, callbackSetShowTodos, showTodo
                                     <label className='col-form-label'> {todo.completed.toString()} </label>
                                 </div>
                                 <div className="col-sm-6">
-                                    <Button variant="warning" hidden={todo.completed} onClick={() => callbackSetCompleted(todo.id)}> Mark Completed</Button>
+                                    <Button variant="warning" hidden={todo.completed} onClick={() => {
+                                        callbackSetCompleted(todo.id);
+                                        todo.completed = true;
+                                    }}> Mark Completed</Button>
                                 </div>
                             </div>
                         </div>

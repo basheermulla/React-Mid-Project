@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import './AddNewUser.css';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Row, Col } from 'react-bootstrap-v5';

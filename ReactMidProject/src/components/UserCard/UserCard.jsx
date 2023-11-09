@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap-v5';
 import './UserCard.css'
@@ -27,11 +26,13 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
             if (result.value) {
                 console.log(event);
                 callbackNavigate(event, user)
-                Swal.fire({
-                    title: "Deleted!",
-                    text: "Your file has been deleted.",
-                    type: "success"
-                });
+                // Swal.fire({
+                //     title: "Deleted!",
+                //     text: "Your file has been deleted.",
+                //     type: "success",
+                //     showConfirmButton: false,
+                //     timer: 1500
+                // });
             }
         });
     }

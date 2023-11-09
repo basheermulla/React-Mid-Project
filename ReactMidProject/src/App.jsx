@@ -11,8 +11,8 @@ import SelectingUserComp from './pages/SelectingUser/SelectingUser';
 import DisplayTodosComp from './pages/DisplayTodos/DisplayTodos';
 import DisplayPostsComp from './pages/DisplayPosts/DisplayPosts';
 import { POSTS_URL, TODOS_URL, USERS_URL } from './config/constants';
-import 'sweetalert2/src/sweetalert2.scss'
-import reactLogo from './assets/react.svg'
+import 'sweetalert2/src/sweetalert2.scss';
+import reactLogo from './assets/react.svg';
 import InvalidPath from './pages/InvalidPath/InvalidPath';
 
 function App() {
@@ -49,9 +49,19 @@ function App() {
         let selectingUserPath = `selectingUser`;
         const selectedUser = obj;
         const postsUser = postsDB.filter((post) => post.userId === selectedUser.id);
-        const todosUser = todosDB.filter((todo) => todo.userId === selectedUser.id);
+        const todosUser = todosDB.filter((todo) => todo.userId === selectedUser.id);        
+        const maxPostId = postsDB.reduce((prev, current) => (prev && prev.id > current.id) ? prev : current, 0).id;
+        const maxTodoId = todosDB.reduce((prev, current) => (prev && prev.id > current.id) ? prev : current, 0).id;
         controlRegionColoredOrange(selectedUser.id);
-        const selectedData = { state: { selectedUser, postsUser, todosUser } };
+        const selectedData = {
+          state: {
+            selectedUser,
+            postsUser,
+            todosUser,
+            maxPostId,
+            maxTodoId
+          }
+        };
         navigate(`/${selectingUserPath}/${selectedUser.id}`, selectedData);
         break;
       default:
@@ -65,6 +75,7 @@ function App() {
   const checkCompletedTodos = (userId) => {
     const todosUser = todosDB.filter((todo) => todo.userId === userId);
     const notYet = todosUser.find((todo) => !todo.completed);
+    console.log(!notYet);
     return !notYet;
   }
 
@@ -109,14 +120,16 @@ function App() {
 
   // <-------------- Update Completed Todo by todoId -------------->
   const updateCompletedTodo = (todoId) => {
-    const newStateTodosDB = todosDB.map((todo) => {
-      if (todo.id === todoId) {
-        const todoComplete = { ...todo, completed: true }
-        return todoComplete;
-      }
-      return todo;
-    });
-    // Update state
+    console.log(todoId);
+    const todo_Completed_Index = todosDB.findIndex((todo) => todo.id === todoId);
+    let newStateTodosDB = [...todosDB];
+    if (!newStateTodosDB[todo_Completed_Index]) {
+      console.log(newStateTodosDB[todo_Completed_Index]);
+    }
+    newStateTodosDB[todo_Completed_Index].completed = true;//////////////////////////////////////////////////////////
+    const userId = newStateTodosDB[todo_Completed_Index].userId
+    const indicate_Completed_AllTodos_User = newStateTodosDB.find((todo) => todo.completed === false && todo.userId === userId);
+    console.log(indicate_Completed_AllTodos_User);
     setTodosDB(newStateTodosDB);
   }
 
@@ -217,20 +230,20 @@ function App() {
   return (
     <>
       {/*---------------------------------------- Header ----------------------------------------*/}
-      <div className="p-5 text-white text-center bg-dark" >
+      <div className="p-1 text-white text-center bg-dark">
         <Container>
-          <Navbar.Brand href='#' onClick={(e) => handleNavigate(e, { id: -1 })} className='justify-content-end flex-grow-1 '>
-            <img
-              alt=""
-              src={reactLogo}
-              width="50"
-              height="50"
-              className="d-inline-block align-top"
-            />{' '}
-            <h2>My React Application</h2>
+          <Navbar.Brand className='justify-content-end flex-grow-1'>
+            <div
+              className='d-inline-block'
+              onClick={(e) => handleNavigate(e, { id: -1 })}
+              style={{ cursor: 'pointer' }}
+            >
+              <img alt="" src={reactLogo} className="d-inline-block align-top logo react" />{' '}
+              <h2>My React Application</h2>
+              <p>This is the My Mid Project of React course!</p>
+            </div>
           </Navbar.Brand>
         </Container>
-        <p>This is the My Mid Project of React course!</p>
       </div>
       {/*---------------------------------------- Navbar ----------------------------------------*/}
       <nav className="navbar navbar-light bg-danger" >

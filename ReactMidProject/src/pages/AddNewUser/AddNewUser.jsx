@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import './AddNewUser.css';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Row, Col } from 'react-bootstrap-v5';
@@ -19,8 +19,8 @@ function AddNewUserComp({ callbackNewUser }) {
         }
 
         Swal.fire({
-            position: "top-end",
-            type: "success",
+            position: "center",
+            icon: "success",
             title: "Your user has been added",
             showConfirmButton: false,
             timer: 1500

@@ -11,7 +11,7 @@ function InvalidPath({ callbackInvalidPath }) {
             callbackInvalidPath(true);
             console.log('Sweet');
             Swal.fire({
-                type: "error",
+                icon: "error",
                 title: "Oops...",
                 text: "Path Not Found"
             }).then((result) => {

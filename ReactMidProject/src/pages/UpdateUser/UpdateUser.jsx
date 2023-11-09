@@ -9,7 +9,7 @@ function UpdateUserComp({ callbackUpdateUser }) {
     const [user, setUser] = useState(useLocation().state.updateUser);
     const updateRef = useRef(null);
 
-    const location = useLocation().state;
+    const { state } = useLocation();
 
     let navigate = useNavigate();
 
@@ -23,18 +23,17 @@ function UpdateUserComp({ callbackUpdateUser }) {
 
         Swal.fire({
             title: "Do you want to save the changes?",
+            showDenyButton: true,
             showCancelButton: true,
-            showConfirmButton: true,
             confirmButtonText: "Save",
-            cancelButtonText: `Don't save`
+            denyButtonText: `Don't save`
         }).then((result) => {
-            console.log(result);
             if (result.value) {
                 callbackUpdateUser(user);
                 routeChange();
                 Swal.fire({
                     position: "center",
-                    type: "success",
+                    icon: "success",
                     title: "Your user has been Saved",
                     showConfirmButton: false,
                     timer: 1500
@@ -51,9 +50,9 @@ function UpdateUserComp({ callbackUpdateUser }) {
     }
 
     useEffect(() => {
-        setUser(location.updateUser);
+        setUser(state.updateUser);
         updateRef.current.focus();
-    }, [location.updateUser.id]);
+    }, [state.updateUser.id]);
 
     return (
         <>
@@ -70,7 +69,6 @@ function UpdateUserComp({ callbackUpdateUser }) {
                                 <Form.Label> Name </Form.Label>
                                 <Form.Control
                                     required
-                                    ref={updateRef}
                                     type="text"
                                     value={user.name}
                                     onChange={(e) => setUser({ ...user, name: e.target.value })}
@@ -115,9 +113,9 @@ function UpdateUserComp({ callbackUpdateUser }) {
                             <br />
                         </div>
                         <br />
-                        <Button variant="outline-danger" onClick={routeChange}> Back </Button>
+                        <Button variant="outline-danger" onClick={routeChange}  > Back </Button>
                         {' '}
-                        <Button variant="primary" type="submit"> Update </Button>
+                        <Button variant="primary" type="submit" ref={updateRef}> Update </Button>
                     </Form>
                 </div>
             </div >

@@ -31,7 +31,7 @@ function SelectingUserComp({ callbackCompletedTodo, callbackAddNewTodo, callback
     const setCompleted = (todoId) => {
         callbackCompletedTodo(todoId);
     }
-    
+
     const addNewTodo = (newTodo) => {
         callbackAddNewTodo(newTodo);
     }
@@ -60,7 +60,6 @@ function SelectingUserComp({ callbackCompletedTodo, callbackAddNewTodo, callback
                     showTodos={showTodos}
                     callbackInsertNewTodo={addNewTodo}
                 />
-
                 <div className="card mb-3 mt-5 border border-dark rounded-bottom" style={{ borderRadius: '32px', backgroundColor: '#e8eaec' }}>
                     <div className='d-flex justify-content-between'>
                         <h3 className='text-center'> Posts - User {id} </h3>

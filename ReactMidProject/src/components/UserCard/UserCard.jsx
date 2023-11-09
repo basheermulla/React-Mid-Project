@@ -16,7 +16,7 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
-            type: "warning",
+            icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
@@ -26,13 +26,13 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
             if (result.value) {
                 console.log(event);
                 callbackNavigate(event, user)
-                // Swal.fire({
-                //     title: "Deleted!",
-                //     text: "Your file has been deleted.",
-                //     type: "success",
-                //     showConfirmButton: false,
-                //     timer: 1500
-                // });
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Your file has been deleted.",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             }
         });
     }
@@ -48,13 +48,19 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
         <>
             <div className='card' style={Object.assign({},
                 !isCompleted ? { borderColor: 'red' } : { borderColor: 'green' },
-                userIdColoredOrange === user.id ? { backgroundColor: 'burlywood' } : { backgroundColor: 'white' }
+                userIdColoredOrange === user.id ? { backgroundColor: 'burlywood' } : { backgroundColor: 'rgba(50,190,255,0.05)' },
             )}>
                 <div className='row'>
                     <div className='col-sm-2'>
-                        <label className='displayInLine_label' value="Hi" onClick={(e) => {
-                            handleNavigate(e)
-                        }}> ID: {user.id} </label>
+                        <label
+                            className='displayInLine_label'
+                            onClick={(e) => {
+                                handleNavigate(e)
+                            }}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            ID: {user.id}
+                        </label>
                     </div>
                 </div>
                 <div className='row'>
@@ -73,15 +79,15 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
                         <input className="form-control-static" type="text" value={user.email || ''} readOnly />
                     </div>
                 </div>
-                <div className='row flex-row-reverse'>
-                    <div className='col-sm-2' hidden={showOtherData}>
-                        <Button variant="danger" onClick={(e) => handleDelete(e)}> Delete </Button>
+                <div className='row d-flex justify-content-end'>
+                    <div className={showOtherData ? 'col-sm-12 mb-3' : 'col-sm-8 mb-3'}>
+                        <Button variant="dark" onMouseOver={(e) => setShowOtherData(true)}> Other Data </Button>
                     </div>
                     <div className='col-sm-2' hidden={showOtherData}>
                         <Button variant="info" onClick={(e) => handleNavigate(e)}> Update </Button>
                     </div>
-                    <div className={showOtherData ? 'col-sm-12 mb-3' : 'col-sm-8 mb-3'}>
-                        <Button variant="dark" onMouseOver={(e) => setShowOtherData(true)}> Other Data </Button>
+                    <div className='col-sm-2' hidden={showOtherData}>
+                        <Button variant="danger" onClick={(e) => handleDelete(e)}> Delete </Button>
                     </div>
                 </div>
                 <div className='otherData_div mb-3' hidden={!showOtherData} onClick={() => setShowOtherData(false)}>
@@ -110,12 +116,12 @@ function UserCardComp({ userData, callbackNavigate, isUnCompleted, userIdColored
                         </div>
                     </div>
                 </div >
-                <div className='row flex-row-reverse'>
-                    <div className='col-sm-2' hidden={!showOtherData}>
-                        <Button variant="danger" onClick={(e) => handleDelete(e)}> Delete </Button>
-                    </div>
+                <div className='row d-flex justify-content-end'>
                     <div className='col-sm-2' hidden={!showOtherData}>
                         <Button variant="info" onClick={(e) => handleNavigate(e)}> Update </Button>
+                    </div>
+                    <div className='col-sm-2' hidden={!showOtherData}>
+                        <Button variant="danger" onClick={(e) => handleDelete(e)}> Delete </Button>
                     </div>
                 </div>
             </div >

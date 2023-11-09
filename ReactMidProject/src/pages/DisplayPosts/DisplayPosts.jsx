@@ -9,6 +9,7 @@ function DisplayPostsComp({ callbackSetShowPosts, showPosts, callbackInsertNewPo
     const [user, setUser] = useState({});
     const [posts, setPosts] = useState([]);
     const [newTitle, setNewTitle] = useState('');
+    const [maxPostId, setMaxPostId] = useState('');
     const [newBody, setNewBody] = useState('');
 
     const { state } = useLocation();
@@ -28,36 +29,41 @@ function DisplayPostsComp({ callbackSetShowPosts, showPosts, callbackInsertNewPo
         }
 
         Swal.fire({
-            position: "top-end",
-            type: "success",
+            position: "center",
+            icon: "success",
             title: "Your post has been added",
             showConfirmButton: false,
             timer: 1500
+        }).then((result) => {
+            if (result.dismiss) {
+                setNewTitle('');
+                setNewBody('');
+                e.target.reset();
+                callbackInsertNewPost(post);
+                callbackSetShowPosts();
+                addNewPost(post);
+            }
         });
 
-        setNewTitle('');
-        setNewBody('');
-        e.target.reset();
 
-        callbackInsertNewPost(post);
-        callbackSetShowPosts();
-        addNewPost(post);
     }
 
     // <-------------- Add New Post -------------->
     const addNewPost = (newPost) => {
-        let newId = 0;
+        let newId = 1;
         if (posts[posts.length - 1]) {
-            newId = posts[posts.length - 1].id + 1;
+            newId = maxPostId + 1;
         }
         const newPost_Obj = { ...newPost, id: newId };
         // Update state
+        state.maxPostId = maxPostId + 1;
         state.postsUser = [...posts, newPost_Obj];
     }
 
     useEffect(() => {
         setUser(state?.selectedUser);
         setPosts(state?.postsUser);
+        setMaxPostId(state?.maxPostId)
     }, [state?.postsUser]);
 
     return (
@@ -85,20 +91,30 @@ function DisplayPostsComp({ callbackSetShowPosts, showPosts, callbackInsertNewPo
 
             <div className="card border border-dark" hidden={showPosts}>
                 <Form onSubmit={handleSubmit} >
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextTitle">
+                    <Form.Group as={Row} className="mb-3" controlId="Form.ControlInputTitle">
                         <Form.Label column sm="3">
                             Title:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control required defaultValue={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+                            <Form.Control
+                                required
+                                type="text"
+                                value={newTitle}
+                                onChange={(e) => setNewTitle(e.target.value)}
+                            />
                         </Col>
                     </Form.Group>
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextBody">
+                    <Form.Group as={Row} className="mb-3" controlId="Form.ControlInputBody">
                         <Form.Label column sm="3">
                             Body:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control required defaultValue={newBody} onChange={(e) => setNewBody(e.target.value)} />
+                            <Form.Control
+                                required
+                                type="text"
+                                value={newBody}
+                                onChange={(e) => setNewBody(e.target.value)}
+                            />
                         </Col>
                     </Form.Group>
                     <div className='d-flex justify-content-end gap-2'>
